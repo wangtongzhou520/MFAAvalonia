@@ -249,6 +249,11 @@
                                                        IconVariant=Regular}"
                                        IsVisible="False"
                                        PageContent="{extensions:ServiceProvider ServiceType={x:Type pages:ResourcesView}}" />
+                <suki:SukiSideMenuItem IsContentMovable="False"
+                                       Header="多实例"
+                                       Icon="{markupExtensions:FluentIcon Icon=WindowMultiple,
+                                                       IconVariant=Regular}"
+                                       PageContent="{extensions:ServiceProvider ServiceType={x:Type pages:MultiInstanceView}}" />
 
             </suki:SukiSideMenu.Items>
 

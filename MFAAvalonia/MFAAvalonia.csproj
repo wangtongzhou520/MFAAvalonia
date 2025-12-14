@@ -13,6 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Folder Include="agent\custom\data\" />
         <Folder Include="Assets\Sound\" />
         <Folder Include="Img\" />
         <Folder Include="Models\" />
@@ -45,7 +46,7 @@
     <!-- Build and Publish -->
     <PropertyGroup>
 		<DebianPackageDependencies>dotnet-runtime-8.0;libc6;libgtk-3-0</DebianPackageDependencies>
-        <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;win-arm64;linux-arm64;osx-arm64</RuntimeIdentifiers> 
+        <RuntimeIdentifiers>win-x64;linux-x64;osx-x64;win-arm64;linux-arm64;osx-arm64</RuntimeIdentifiers>
 		<OutputPath>..\bin\$(Platform)\$(Configuration)\</OutputPath>
 		<IntermediateOutputPath>obj\$(Platform)\$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
         <PublishReadyToRun>false</PublishReadyToRun>
@@ -58,6 +59,16 @@
 		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    </PropertyGroup>
+
+    <!-- Debug配置：生成PDB调试符号 -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+
+    <!-- Release配置：不生成PDB调试符号 -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
@@ -198,28 +209,20 @@
     <!-- 根据发布的目标系统，仅复制对应脚本到publish目录 -->
     <ItemGroup>
         <!-- Windows 脚本：匹配 win-x64 或 win-arm64 -->
-        <Content Include="DependencySetup_依赖库安装_win.bat"
-                 Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))"
-                 CopyToPublishDirectory="PreserveNewest">
+        <Content Include="DependencySetup_依赖库安装_win.bat" Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))" CopyToPublishDirectory="PreserveNewest">
             <Link>DependencySetup_依赖库安装_win.bat</Link>
         </Content>
-		<Content Include="InstallRuntime.ps1"
-                 Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))"
-                 CopyToPublishDirectory="PreserveNewest">
+		<Content Include="InstallRuntime.ps1" Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))" CopyToPublishDirectory="PreserveNewest">
             <Link>InstallRuntime.ps1</Link>
         </Content>
 
         <!-- Linux 脚本：匹配 linux-x64 或 linux-arm64 -->
-        <Content Include="DependencySetup_依赖库安装_linux.sh"
-                 Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux'))"
-                 CopyToPublishDirectory="PreserveNewest">
+        <Content Include="DependencySetup_依赖库安装_linux.sh" Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux'))" CopyToPublishDirectory="PreserveNewest">
             <Link>DependencySetup_依赖库安装_linux.sh</Link>
         </Content>
 
         <!-- macOS 脚本：匹配 osx-x64 或 osx-arm64 -->
-        <Content Include="DependencySetup_依赖库安装_mac.sh"
-                 Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('osx'))"
-                 CopyToPublishDirectory="PreserveNewest">
+        <Content Include="DependencySetup_依赖库安装_mac.sh" Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('osx'))" CopyToPublishDirectory="PreserveNewest">
             <Link>DependencySetup_依赖库安装_mac.sh</Link>
         </Content>
     </ItemGroup>
@@ -287,23 +290,15 @@
 	  <!-- 根据平台收集需要移动的库文件 -->
 	  <ItemGroup>
 		<!-- Windows: 移动 DLL 文件 -->
-		<WinLibFilesToMove Include="$(MainPublishDir)*.dll" 
-						   Exclude="$(MainPublishDir)MFAAvalonia.dll;$(MainPublishDir)MFAUpdater.dll"
-						   Condition="'$(RuntimeIdentifier)' == 'win-x64' OR '$(RuntimeIdentifier)' == 'win-arm64'" />
+		<WinLibFilesToMove Include="$(MainPublishDir)*.dll" Exclude="$(MainPublishDir)MFAAvalonia.dll;$(MainPublishDir)MFAUpdater.dll" Condition="'$(RuntimeIdentifier)' == 'win-x64' OR '$(RuntimeIdentifier)' == 'win-arm64'" />
 		
 		<!-- Linux: 移动 DLL 和 SO 文件 -->
-		<LinuxLibFilesToMove Include="$(MainPublishDir)*.dll" 
-							 Exclude="$(MainPublishDir)MFAAvalonia.dll;$(MainPublishDir)MFAUpdater.dll"
-							 Condition="'$(RuntimeIdentifier)' == 'linux-x64' OR '$(RuntimeIdentifier)' == 'linux-arm64'" />
-		<LinuxSoFilesToMove Include="$(MainPublishDir)*.so"
-							Condition="'$(RuntimeIdentifier)' == 'linux-x64' OR '$(RuntimeIdentifier)' == 'linux-arm64'" />
+		<LinuxLibFilesToMove Include="$(MainPublishDir)*.dll" Exclude="$(MainPublishDir)MFAAvalonia.dll;$(MainPublishDir)MFAUpdater.dll" Condition="'$(RuntimeIdentifier)' == 'linux-x64' OR '$(RuntimeIdentifier)' == 'linux-arm64'" />
+		<LinuxSoFilesToMove Include="$(MainPublishDir)*.so" Condition="'$(RuntimeIdentifier)' == 'linux-x64' OR '$(RuntimeIdentifier)' == 'linux-arm64'" />
 		
 		<!-- macOS: 移动 DLL 和 DYLIB 文件 -->
-		<MacLibFilesToMove Include="$(MainPublishDir)*.dll" 
-						   Exclude="$(MainPublishDir)MFAAvalonia.dll;$(MainPublishDir)MFAUpdater.dll"
-						   Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR '$(RuntimeIdentifier)' == 'osx-arm64'" />
-		<MacDylibFilesToMove Include="$(MainPublishDir)*.dylib"
-							 Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR '$(RuntimeIdentifier)' == 'osx-arm64'" />
+		<MacLibFilesToMove Include="$(MainPublishDir)*.dll" Exclude="$(MainPublishDir)MFAAvalonia.dll;$(MainPublishDir)MFAUpdater.dll" Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR '$(RuntimeIdentifier)' == 'osx-arm64'" />
+		<MacDylibFilesToMove Include="$(MainPublishDir)*.dylib" Condition="'$(RuntimeIdentifier)' == 'osx-x64' OR '$(RuntimeIdentifier)' == 'osx-arm64'" />
 	  </ItemGroup>
         
 	  <!-- 移动库文件到 libs 文件夹 -->

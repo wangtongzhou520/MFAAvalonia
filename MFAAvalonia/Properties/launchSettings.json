@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "MFAAvalonia": {
+      "commandName": "Project",
+      "workingDirectory": "E:\\脚本\\MFAAvalonia\\bin\\x64\\Debug",
+      "nativeDebugging": false
+    }
+  }
+}

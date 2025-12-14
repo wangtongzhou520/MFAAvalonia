@@ -1,0 +1,376 @@
+<UserControl
+    d:DesignHeight="600"
+    d:DesignWidth="900"
+    mc:Ignorable="d"
+    x:Class="MFAAvalonia.Views.Pages.MultiInstanceView"
+    x:DataType="pages:MultiInstanceViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helper="clr-namespace:MFAAvalonia.Helper"
+    xmlns:markup="https://codewf.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:multiInstance="clr-namespace:MFAAvalonia.Models.MultiInstance"
+    xmlns:pages="clr-namespace:MFAAvalonia.ViewModels.Pages"
+    xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Design.DataContext>
+        <pages:MultiInstanceViewModel />
+    </Design.DataContext>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="0" ColumnDefinitions="400,*">
+
+            <!-- 左侧：模拟器列表 -->
+            <Border
+                Background="{DynamicResource SukiCardBackground}"
+                BorderBrush="{DynamicResource SukiBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Margin="0,0,8,0"
+                Padding="16">
+                <Grid RowDefinitions="Auto,*">
+
+                    <!-- 模拟器列表标题和刷新按钮 -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                        <TextBlock
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Grid.Column="0"
+                            Text="模拟器列表"
+                            VerticalAlignment="Center" />
+                        <Button
+                            Command="{Binding RefreshDevicesCommand}"
+                            Content="🔄 刷新"
+                            FontSize="12"
+                            Grid.Column="1"
+                            Height="28"
+                            Padding="8,4" />
+                    </Grid>
+
+                    <!-- 模拟器列表 -->
+                    <ScrollViewer Grid.Row="1">
+                        <ItemsControl ItemsSource="{Binding Accounts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="multiInstance:MultiAccount">
+                                    <Border
+                                        Background="{DynamicResource SukiBackground}"
+                                        BorderBrush="{DynamicResource SukiBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Margin="0,0,0,8"
+                                        Padding="12">
+                                        <Grid RowDefinitions="Auto,Auto">
+
+                                            <!-- 第一行：名称、队长号标签、状态信息和启用开关 -->
+                                            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Grid.Row="0">
+                                                <TextBlock
+                                                    FontSize="15"
+                                                    FontWeight="Medium"
+                                                    Grid.Column="0"
+                                                    Text="{Binding Name}"
+                                                    VerticalAlignment="Center" />
+
+                                                <!-- 队长号标签 -->
+                                                <Border
+                                                    Background="{DynamicResource SukiPrimaryColor}"
+                                                    CornerRadius="4"
+                                                    Grid.Column="1"
+                                                    IsVisible="{Binding IsLeader}"
+                                                    Margin="0,0,8,0"
+                                                    Padding="6,2"
+                                                    VerticalAlignment="Center">
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        FontWeight="Bold"
+                                                        Foreground="White"
+                                                        Text="队长" />
+                                                </Border>
+
+                                                <!-- 设置为队长号按钮 -->
+                                                <Button
+                                                    Command="{Binding $parent[ItemsControl].((pages:MultiInstanceViewModel)DataContext).SetLeaderCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="👑"
+                                                    FontSize="14"
+                                                    Grid.Column="1"
+                                                    Height="24"
+                                                    IsVisible="{Binding !IsLeader}"
+                                                    Margin="0,0,8,0"
+                                                    Padding="6,0"
+                                                    ToolTip.Tip="设为队长号"
+                                                    Width="32" />
+
+                                                <!-- 状态和进度 -->
+                                                <StackPanel Grid.Column="2" Margin="0,0,8,0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <Border
+                                                        Background="{Binding StatusColor}"
+                                                        CornerRadius="8"
+                                                        Height="8"
+                                                        VerticalAlignment="Center"
+                                                        Width="8" />
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        Foreground="{Binding StatusColor}"
+                                                        Text="{Binding StatusText}"
+                                                        VerticalAlignment="Center" />
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource SukiLowText}"
+                                                        Text="{Binding Progress, StringFormat='{}{0}%'}"
+                                                        VerticalAlignment="Center" />
+                                                </StackPanel>
+
+                                                <ToggleSwitch
+                                                    Grid.Column="3"
+                                                    IsChecked="{Binding IsEnabled}"
+                                                    OffContent=""
+                                                    OnContent="" />
+                                            </Grid>
+
+                                            <!-- 第二行：模拟器信息 -->
+                                            <TextBlock
+                                                FontSize="11"
+                                                Foreground="{DynamicResource SukiLowText}"
+                                                Grid.Row="1"
+                                                Margin="0,4,0,0">
+                                                <Run Text="模拟器：" />
+                                                <Run FontWeight="Medium" Text="{Binding EmulatorType, Mode=OneWay}" />
+                                                <Run Text=" - 索引：" />
+                                                <Run FontWeight="Medium" Text="{Binding EmulatorIndex, Mode=OneWay}" />
+                                            </TextBlock>
+
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                </Grid>
+            </Border>
+
+            <!-- 右侧：任务列表区 -->
+            <Border
+                Background="{DynamicResource SukiCardBackground}"
+                BorderBrush="{DynamicResource SukiBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Grid.Column="1"
+                Padding="16">
+
+                <Grid RowDefinitions="Auto,*">
+
+                    <!-- 任务列表标题 -->
+                    <TextBlock
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Grid.Row="0"
+                        Margin="0,0,0,12"
+                        Text="任务列表" />
+
+                    <!-- 任务列表 - 3:2分栏布局 -->
+                    <Grid Grid.Row="1" ColumnDefinitions="3*,2*">
+
+                        <!-- 左侧：单人任务 (60%) -->
+                        <Border Grid.Column="0" Padding="0,0,8,0">
+                            <ScrollViewer>
+                                <StackPanel Spacing="8">
+                                    <!-- 分类标题和操作按钮 -->
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <TextBlock
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource SukiPrimaryColor}"
+                                            Grid.Column="0"
+                                            Text="单人任务"
+                                            VerticalAlignment="Center" />
+                                        <Button
+                                            Command="{Binding SelectAllSoloTasksCommand}"
+                                            Content="全选"
+                                            FontSize="11"
+                                            Grid.Column="1"
+                                            Height="24"
+                                            Margin="0,0,4,0"
+                                            Padding="8,2" />
+                                        <Button
+                                            Command="{Binding DeselectAllSoloTasksCommand}"
+                                            Content="取消"
+                                            FontSize="11"
+                                            Grid.Column="2"
+                                            Height="24"
+                                            Padding="8,2" />
+                                    </Grid>
+
+                                    <!-- 单人任务列表 -->
+                                    <ItemsControl ItemsSource="{Binding SoloTasks}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="multiInstance:MultiTaskItem">
+                                                <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,0,6">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <!-- 任务图标 -->
+                                                        <Image
+                                                            Height="16"
+                                                            IsVisible="{Binding HasIcon}"
+                                                            Source="{Binding ResolvedIcon}"
+                                                            VerticalAlignment="Center"
+                                                            Width="16" />
+
+                                                        <!-- 任务名称和描述 -->
+                                                        <StackPanel>
+                                                            <TextBlock FontWeight="Medium" Text="{Binding DisplayName}" />
+                                                            <TextBlock
+                                                                FontSize="11"
+                                                                Foreground="{DynamicResource SukiLowText}"
+                                                                IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                                                Text="{Binding Description}"
+                                                                TextWrapping="Wrap" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- 右侧：组队任务 (40%) -->
+                        <Border Grid.Column="1" Padding="8,0,0,0">
+                            <ScrollViewer>
+                                <StackPanel Spacing="8">
+                                    <!-- 分类标题和操作按钮 -->
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <TextBlock
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource SukiPrimaryColor}"
+                                            Grid.Column="0"
+                                            Text="组队任务"
+                                            VerticalAlignment="Center" />
+                                        <Button
+                                            Command="{Binding SelectAllTeamTasksCommand}"
+                                            Content="全选"
+                                            FontSize="11"
+                                            Grid.Column="1"
+                                            Height="24"
+                                            Margin="0,0,4,0"
+                                            Padding="8,2" />
+                                        <Button
+                                            Command="{Binding DeselectAllTeamTasksCommand}"
+                                            Content="取消"
+                                            FontSize="11"
+                                            Grid.Column="2"
+                                            Height="24"
+                                            Padding="8,2" />
+                                    </Grid>
+
+                                    <!-- 组队任务列表 -->
+                                    <ItemsControl ItemsSource="{Binding TeamTasks}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="multiInstance:MultiTaskItem">
+                                                <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,0,6">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <!-- 任务图标 -->
+                                                        <Image
+                                                            Height="16"
+                                                            IsVisible="{Binding HasIcon}"
+                                                            Source="{Binding ResolvedIcon}"
+                                                            VerticalAlignment="Center"
+                                                            Width="16" />
+
+                                                        <!-- 任务名称和描述 -->
+                                                        <StackPanel>
+                                                            <TextBlock FontWeight="Medium" Text="{Binding DisplayName}" />
+                                                            <TextBlock
+                                                                FontSize="11"
+                                                                Foreground="{DynamicResource SukiLowText}"
+                                                                IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                                                Text="{Binding Description}"
+                                                                TextWrapping="Wrap" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+
+                    </Grid>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
+
+        <!-- 底部：执行控制区 -->
+        <Border
+            Background="{DynamicResource SukiCardBackground}"
+            BorderBrush="{DynamicResource SukiBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Grid.Row="1"
+            Margin="0,8,0,0"
+            Padding="16">
+
+            <Grid RowDefinitions="Auto,Auto">
+
+                <!-- 执行状态 -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,12" Spacing="6">
+                    <TextBlock FontSize="13" FontWeight="Medium" Text="启用状态" />
+                    <TextBlock FontSize="12" Foreground="{DynamicResource SukiLowText}">
+                        <Run Text="已启用：" />
+                        <Run
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource SukiPrimaryColor}"
+                            Text="{Binding EnabledAccountCount, Mode=OneWay}" />
+                        <Run Text=" / 5 " />
+                        <Run Text=" | 队长号：" />
+                        <Run
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource SukiPrimaryColor}"
+                            Text="{Binding LeaderAccountName, Mode=OneWay}" />
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- 控制按钮 -->
+                <UniformGrid Columns="4" Grid.Row="1">
+                    <Button
+                        Classes="Accent"
+                        Command="{Binding StartAllCommand}"
+                        Content="▶ 开始执行"
+                        IsEnabled="{Binding !IsRunning}"
+                        Margin="0,0,4,0" />
+                    <Button
+                        Command="{Binding StopAllCommand}"
+                        Content="⏹ 停止全部"
+                        IsEnabled="{Binding IsRunning}"
+                        Margin="2,0" />
+                    <Button
+                        Command="{Binding ResetAllCommand}"
+                        Content="🔄 重置状态"
+                        IsEnabled="{Binding !IsRunning}"
+                        Margin="2,0" />
+                    <Button
+                        Content="📋 查看日志"
+                        IsEnabled="False"
+                        Margin="4,0,0,0"
+                        ToolTip.Tip="即将支持" />
+                </UniformGrid>
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+
+</UserControl>
