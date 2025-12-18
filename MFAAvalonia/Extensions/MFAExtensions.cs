@@ -451,27 +451,26 @@ public static class MFAExtensions
         return VersionChecker.VersionType.Stable;
     }
 
-        public static Bitmap? ToBitmap(this MaaImageBuffer buffer)
+    public static Bitmap? ToBitmap(this MaaImageBuffer buffer)
+    {
+        if (buffer.IsInvalid || buffer.IsEmpty || !buffer.TryGetEncodedData(out Stream encodedDataStream)) return null;
+
+        try
         {
-            if (!buffer.TryGetEncodedData(out Stream EncodedDataStream)) return null;
-    
-            try
+            using (encodedDataStream)
             {
-                // 使用 using 确保 Stream 被正确释放，避免 unmanaged memory 泄漏
-                using (EncodedDataStream)
-                {
-                    EncodedDataStream.Seek(0, SeekOrigin.Begin);
-                    return new Bitmap(EncodedDataStream);
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                LoggerHelper.Error($"解码失败: {ex.Message}");
-                // 确保异常情况下也释放 Stream
-                EncodedDataStream?.Dispose();
-                return null;
+                encodedDataStream.Seek(0, SeekOrigin.Begin);
+                return new Bitmap(encodedDataStream);
             }
         }
+        catch (Exception ex)
+        {
+            LoggerHelper.Error($"Bitmap 创建失败: {ex.Message}");
+            // 确保异常情况下也释放 Stream
+            encodedDataStream?.Dispose();
+            return null;
+        }
+    }
     // public static System.Drawing.Bitmap? ToDrawingBitmap(this Bitmap? bitmap)
     // {
     //     if (bitmap == null)
@@ -484,52 +483,46 @@ public static class MFAExtensions
     //     
     //     return new System.Drawing.Bitmap(memory);
     // }
-        public static Bitmap DrawRectangle(this Bitmap sourceBitmap, MaaRectBuffer rect, IBrush color, double thickness = 1.5)
+    public static Bitmap DrawRectangle(this Bitmap sourceBitmap, MaaRectBuffer rect, IBrush color, double thickness = 1.5)
+    {
+        if (sourceBitmap == null)
+            throw new ArgumentNullException(nameof(sourceBitmap));
+
+        // 提前获取需要的值，避免在异步操作中访问可能已释放的对象
+        var bitmapSize = sourceBitmap.Size;
+        var pixelSize = sourceBitmap.PixelSize;
+        var dpi = sourceBitmap.Dpi;
+
+        var renderBitmap = new RenderTargetBitmap(pixelSize, dpi);
+
+        DispatcherHelper.PostOnMainThread(() =>
         {
-            if (sourceBitmap == null)
-                throw new ArgumentNullException(nameof(sourceBitmap));
-    
-            // 提前获取需要的值，避免在异步操作中访问可能已释放的对象
-            var bitmapSize = sourceBitmap.Size;
-            var pixelSize = sourceBitmap.PixelSize;
-            var dpi = sourceBitmap.Dpi;
-    
-            var renderBitmap = new RenderTargetBitmap(pixelSize, dpi);
-    
-            DispatcherHelper.PostOnMainThread(() =>
+            try
             {
-                try
+                // 使用 DrawingContext 绘制
+                using var context = renderBitmap.CreateDrawingContext();
+
+                // 1. 绘制原始图像作为背景
+                context.DrawImage(sourceBitmap, new Rect(bitmapSize));
+
+                // 2. 创建抗锯齿画笔
+                var pen = new Avalonia.Media.Pen(color, thickness)
                 {
-                    // 二次检查：确保 sourceBitmap 仍然有效
-                    if (sourceBitmap == null)
-                    {
-                        LoggerHelper.Warning("DrawRectangle: sourceBitmap在异步操作中变为 null");
-                        return;
-                    }
-    
-                    // 使用 DrawingContext 绘制
-                    using var context = renderBitmap.CreateDrawingContext();
-    
-                    // 1. 绘制原始图像作为背景
-                    context.DrawImage(sourceBitmap, new Rect(bitmapSize));
-    
-                    // 2. 创建抗锯齿画笔
-                    var pen = new Avalonia.Media.Pen(color, thickness)
-                    {
-                        LineJoin = PenLineJoin.Round,
-                        LineCap = PenLineCap.Round
-                    };
-    
-                    // 3. 绘制矩形边框
-                    context.DrawRectangle(pen, new Rect(rect.X, rect.Y, rect.Width, rect.Height));
-                }
-                catch (Exception ex)
-                {
-                    LoggerHelper.Error($"DrawRectangle 绘制失败: {ex.Message}");
-                }
-            });
-            return renderBitmap;
-        }
+                    LineJoin = PenLineJoin.Round,
+                    LineCap = PenLineCap.Round
+                };
+
+                // 3. 绘制矩形边框
+                context.DrawRectangle(pen, new Rect(rect.X, rect.Y, rect.Width, rect.Height));
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Error($"DrawRectangle 绘制失败: {ex.Message}");
+            }
+        });
+        return renderBitmap;
+    }
+
 
     // public static Bitmap? ToAvaloniaBitmap(this System.Drawing.Bitmap? bitmap)
     // {
@@ -796,57 +789,57 @@ public static class MFAExtensions
     }
 
     /// <summary>
-        /// 生成ADB设备的指纹字符串，用于设备匹配
-        /// 指纹由 Name + AdbPath + Index 组成，可以稳定识别同一个模拟器实例
-        /// </summary>
-        /// <param name="device">ADB设备信息</param>
-        /// <returns>设备指纹字符串</returns>
-        public static string GenerateDeviceFingerprint(this MaaFramework.Binding.AdbDeviceInfo device)
-        {
-            var index = DeviceDisplayConverter.GetFirstEmulatorIndex(device.Config);
-            return GenerateDeviceFingerprint(device.Name, device.AdbPath, index);
-        }
-    
-        /// <summary>
-        /// 生成ADB设备的指纹字符串
-        /// </summary>
-        /// <param name="name">设备名称</param>
-        /// <param name="adbPath">ADB路径</param>
-        /// <param name="index">模拟器索引（-1表示无索引）</param>
-        /// <returns>设备指纹字符串</returns>
-        public static string GenerateDeviceFingerprint(string name, string adbPath, int index)
-        {
-            // 规范化AdbPath：只保留文件名部分，忽略路径差异
-            var normalizedAdbPath = adbPath;
-    
-            // 指纹格式：Name|AdbPath|Index
-            return $"{name}|{normalizedAdbPath}|{index}";
-        }
-    
-        /// <summary>
-        /// 比较两个设备是否匹配（基于指纹）
-        /// 当任一方 index 为 -1 时，只比较 Name 和 AdbPath
-        /// </summary>
-        /// <param name="device">当前设备</param>
-        /// <param name="savedDevice">保存的设备</param>
-        /// <returns>是否匹配</returns>
-        public static bool MatchesFingerprint(this MaaFramework.Binding.AdbDeviceInfo device, MaaFramework.Binding.AdbDeviceInfo savedDevice)
-        {
-            var deviceIndex = DeviceDisplayConverter.GetFirstEmulatorIndex(device.Config);
-            var savedIndex = DeviceDisplayConverter.GetFirstEmulatorIndex(savedDevice.Config);
-            
-            // 比较 Name 和 AdbPath
-            bool nameMatches = device.Name == savedDevice.Name;
-            bool adbPathMatches = device.AdbPath == savedDevice.AdbPath;
-            
-            // 如果 Name 或 AdbPath 不匹配，直接返回 false
-            if (!nameMatches || !adbPathMatches)return false;
-            
-            // 如果任一方 index 为 -1，则不比较 index，只要 Name 和 AdbPath 匹配即可
-            if (deviceIndex == -1 || savedIndex == -1)
-                return true;
-            
-            // 两方 index 都有效时，需要 index 也匹配
-            return deviceIndex == savedIndex;
-        }
+    /// 生成ADB设备的指纹字符串，用于设备匹配
+    /// 指纹由 Name + AdbPath + Index 组成，可以稳定识别同一个模拟器实例
+    /// </summary>
+    /// <param name="device">ADB设备信息</param>
+    /// <returns>设备指纹字符串</returns>
+    public static string GenerateDeviceFingerprint(this MaaFramework.Binding.AdbDeviceInfo device)
+    {
+        var index = DeviceDisplayConverter.GetFirstEmulatorIndex(device.Config);
+        return GenerateDeviceFingerprint(device.Name, device.AdbPath, index);
     }
+
+    /// <summary>
+    /// 生成ADB设备的指纹字符串
+    /// </summary>
+    /// <param name="name">设备名称</param>
+    /// <param name="adbPath">ADB路径</param>
+    /// <param name="index">模拟器索引（-1表示无索引）</param>
+    /// <returns>设备指纹字符串</returns>
+    public static string GenerateDeviceFingerprint(string name, string adbPath, int index)
+    {
+        // 规范化AdbPath：只保留文件名部分，忽略路径差异
+        var normalizedAdbPath = adbPath;
+
+        // 指纹格式：Name|AdbPath|Index
+        return $"{name}|{normalizedAdbPath}|{index}";
+    }
+
+    /// <summary>
+    /// 比较两个设备是否匹配（基于指纹）
+    /// 当任一方 index 为 -1 时，只比较 Name 和 AdbPath
+    /// </summary>
+    /// <param name="device">当前设备</param>
+    /// <param name="savedDevice">保存的设备</param>
+    /// <returns>是否匹配</returns>
+    public static bool MatchesFingerprint(this MaaFramework.Binding.AdbDeviceInfo device, MaaFramework.Binding.AdbDeviceInfo savedDevice)
+    {
+        var deviceIndex = DeviceDisplayConverter.GetFirstEmulatorIndex(device.Config);
+        var savedIndex = DeviceDisplayConverter.GetFirstEmulatorIndex(savedDevice.Config);
+
+        // 比较 Name 和 AdbPath
+        bool nameMatches = device.Name == savedDevice.Name;
+        bool adbPathMatches = device.AdbPath == savedDevice.AdbPath;
+
+        // 如果 Name 或 AdbPath 不匹配，直接返回 false
+        if (!nameMatches || !adbPathMatches) return false;
+
+        // 如果任一方 index 为 -1，则不比较 index，只要 Name 和 AdbPath 匹配即可
+        if (deviceIndex == -1 || savedIndex == -1)
+            return true;
+
+        // 两方 index 都有效时，需要 index 也匹配
+        return deviceIndex == savedIndex;
+    }
+}

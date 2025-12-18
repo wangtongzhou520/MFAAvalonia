@@ -44,7 +44,7 @@ sealed class Program
     public static Dictionary<string, string> Args { get; private set; } = new();
     private static Mutex? _mutex;
     private static bool _mutexReleased = false;
-    private static readonly object _mutexLock = new(); 
+    private static readonly object _mutexLock = new();
     private static int _mutexOwnerThreadId = -1;
     public static bool IsNewInstance = true;
 
@@ -183,7 +183,9 @@ sealed class Program
             }
 
             var parsedArgs = ParseArguments(args);
-            var mutexName = "MFA_"
+            var mutexName = "MFAAvalonia_"
+                + RootViewModel.Version
+                + "_"
                 + Directory.GetCurrentDirectory().Replace("\\", "_")
                     .Replace("/", "_")
                     .Replace(":", string.Empty);

@@ -17,20 +17,17 @@ public partial class TextEraserButton : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
-    public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<TextEraserButton, string>(nameof(Text), defaultValue: "");
+    public static readonly StyledProperty<TextBox> TextProperty = AvaloniaProperty.Register<TextEraserButton, TextBox>(nameof(Text));
 
-    public string Text
+
+    public TextBox Text
     {
-        get { return GetValue(TextProperty); }
-        set
-        {
-            SetValue(TextProperty, value);
-        }
+        get => GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
     }
 
     private void Button_OnClick(object sender, RoutedEventArgs e)
     {
-        Text = "_";
-        Text = "";
+        Text!.Text = string.Empty;
     }
 }

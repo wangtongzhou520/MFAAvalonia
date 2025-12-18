@@ -688,7 +688,6 @@ public partial class MaaInterface
         {
             DisplayName = LanguageHelper.GetLocalizedDisplayName(Label, Name ?? string.Empty);
             DisplayDescription = LanguageHelper.GetLocalizedString(Description.ResolveContentAsync().Result);
-
             HasDescription = !string.IsNullOrWhiteSpace(DisplayDescription);
             UpdateIcon();
         }
@@ -1004,7 +1003,6 @@ public partial class MaaInterface
             sb.Append(c);
             lastChar = c;
         }
-
         return sb.ToString();
     }
 

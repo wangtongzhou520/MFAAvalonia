@@ -330,6 +330,81 @@ public partial class TaskQueueView : UserControl
     {
         Introduction.Markdown = markDown;
     }
+    /// <summary>
+    /// 设置仅显示 IntroductionCard 的模式（隐藏 SettingCard，IntroductionCard 占满）
+    /// </summary>
+    private void SetIntroductionOnlyMode()
+    {
+        _maxHeightBindingActive = false;
+        SettingCard.IsVisible = false;
+        IntroductionCard.IsVisible = true;
+        IntroductionCard.Margin = new Thickness(0, 15, 0, 25);
+        Grid.SetRow(IntroductionCard, 0);
+        IntroductionCard.ClearValue(MaxHeightProperty);
+        IntroductionCard.MaxHeight = double.PositiveInfinity;
+    }
+    
+    /// <summary>
+    /// 设置仅显示 SettingCard 的模式（隐藏 IntroductionCard，SettingCard 占满）
+    /// </summary>
+    private void SetSettingOnlyMode()
+    {
+        _maxHeightBindingActive = false;
+        SettingCard.IsVisible = true;
+        IntroductionCard.IsVisible = false;
+        IntroductionCard.Margin = new Thickness(0, -7, 0, 25);
+        Grid.SetRow(IntroductionCard, 1);
+    }
+    
+    private bool _maxHeightBindingActive = false;
+
+    /// <summary>
+    /// 设置正常双卡片模式（SettingCard 和 IntroductionCard 都显示）
+    /// </summary>
+    private void SetNormalMode(bool hasIntroduction)
+    {
+        SettingCard.IsVisible = true;
+        IntroductionCard.IsVisible = hasIntroduction;
+        IntroductionCard.Margin = new Thickness(0, -7, 0, 25);
+        Grid.SetRow(IntroductionCard, 1);
+
+        // 恢复 MaxHeight 绑定（使用父 Grid 高度的一半）
+        if (!_maxHeightBindingActive && Grid1 != null)
+        {
+            _maxHeightBindingActive = true;
+            UpdateIntroductionCardMaxHeight();
+            Grid1.PropertyChanged += (_, e) =>
+            {
+                if (e.Property.Name == nameof(Grid1.Bounds) && _maxHeightBindingActive)
+                {
+                    UpdateIntroductionCardMaxHeight();
+                }
+            };
+        }
+        else
+        {
+            UpdateIntroductionCardMaxHeight();
+        }
+    }
+
+    private void UpdateIntroductionCardMaxHeight()
+    {
+        if (Grid1 != null && _maxHeightBindingActive)
+        {
+            IntroductionCard.MaxHeight = Grid1.Bounds.Height / 2;
+        }
+    }
+
+    /// <summary>
+    /// 设置隐藏所有卡片模式（SettingCard 隐藏，IntroductionCard 占满但内容为空）
+    /// </summary>
+    private void SetHiddenMode()
+    {
+        SettingCard.IsVisible = true;
+        IntroductionCard.IsVisible = false;
+        IntroductionCard.Margin = new Thickness(0, -7, 0, 25);
+        Grid.SetRow(IntroductionCard, 1);
+    }
 
     public void SetOption(DragItemViewModel dragItem, bool value, bool init = false)
     {
@@ -393,6 +468,32 @@ public partial class TaskQueueView : UserControl
             });
 
             SetMarkDown(newIntroduction);
+
+            // 检查是否有配置选项（面板是否有内容）
+            var hasSettings = false;
+            if (CommonPanelCache.TryGetValue(cacheKey, out var panel))
+            {
+                hasSettings = panel.IsVisible && ((Panel)panel).Children.Count > 0;
+            }
+
+            var hasIntroduction = !string.IsNullOrWhiteSpace(newIntroduction);
+
+            // 根据配置选项和介绍内容决定布局模式
+            if (!hasSettings && hasIntroduction)
+            {
+                // 没有配置选项但有介绍：隐藏 SettingCard，IntroductionCard 占满
+                SetIntroductionOnlyMode();
+            }
+            else if (hasSettings && !hasIntroduction)
+            {
+                // 有配置选项但没有介绍：隐藏 IntroductionCard，SettingCard 占满
+                SetSettingOnlyMode();
+            }
+            else
+            {
+                // 两者都有或都没有：正常显示
+                SetNormalMode(hasIntroduction);
+            }
         }
     }
 
@@ -458,6 +559,7 @@ public partial class TaskQueueView : UserControl
         }
 
         Introduction.Markdown = "";
+        SetHiddenMode();
     }
 
     private void HideAllPanels()
@@ -468,6 +570,7 @@ public partial class TaskQueueView : UserControl
         }
 
         Introduction.Markdown = "";
+        SetHiddenMode();
     }
 
 
@@ -1460,16 +1563,15 @@ public partial class TaskQueueView : UserControl
         outerContainer.Children.Add(grid);
 
         // 用 Border 包装子选项容器，添加左边框线以增强视觉层次
-        var primaryColor = SukiTheme.GetInstance()?.ActiveColorTheme?.Primary;
         var subOptionsBorder = new Border
         {
-            BorderBrush = primaryColor.HasValue ? new SolidColorBrush(primaryColor.Value) : Brushes.Gray,
             BorderThickness = new Thickness(2, 0, 0, 0),
+            Background = Brushes.Transparent,
             Margin = new Thickness(12, 2, 0, 2),
             Padding = new Thickness(4, -12, 0, 2),
-            Child = subOptionsContainer,
-            Opacity = 0.8
+            Child = subOptionsContainer
         };
+        subOptionsBorder.Bind(Border.BorderBrushProperty, new DynamicResourceExtension("SukiPrimaryColor"));
         subOptionsBorder.Bind(IsVisibleProperty, new Binding("Children.Count")
         {
             Source = subOptionsContainer,
@@ -1801,16 +1903,15 @@ public partial class TaskQueueView : UserControl
         outerContainer.Children.Add(grid);
 
 // 用 Border 包装子选项容器，添加左边框线以增强视觉层次
-        var primaryColor2 = SukiTheme.GetInstance()?.ActiveColorTheme?.Primary;
         var subOptionsBorder = new Border
         {
-            BorderBrush = primaryColor2.HasValue ? new SolidColorBrush(primaryColor2.Value) : Brushes.Gray,
             BorderThickness = new Thickness(2, 0, 0, 0),
             Margin = new Thickness(12, 2, 0, 2),
             Padding = new Thickness(4, -10, 0, 2),
             Child = subOptionsContainer,
-            Opacity = 0.8
+            Background = Brushes.Transparent,
         };
+        subOptionsBorder.Bind(Border.BorderBrushProperty, new DynamicResourceExtension("SukiPrimaryColor"));
         subOptionsBorder.Bind(IsVisibleProperty, new Binding("Children.Count")
         {
             Source = subOptionsContainer,

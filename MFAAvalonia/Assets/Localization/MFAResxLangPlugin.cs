@@ -130,7 +130,6 @@ public class MFAResxLangPlugin : ILangPlugin
         return key;
     }
 
-
     private void Sync(CultureInfo cultureInfo)
     {
         if (_resourceManagers == null || _resourceManagers.Count == 0)
@@ -181,7 +180,11 @@ public class MFAResxLangPlugin : ILangPlugin
             {
                 if (entry is { Key: string key, Value: string value })
                 {
-                    currentLanResources.Languages[key] = value;
+                    // 使用字符串驻留减少重复字符串的内存占用
+                    // 对于资源键和值都使用驻留,因为很多资源字符串是重复的
+                    var internedKey = string.Intern(key);
+                    var internedValue = string.Intern(value);
+                    currentLanResources.Languages[internedKey] = internedValue;
                 }
             }
         }

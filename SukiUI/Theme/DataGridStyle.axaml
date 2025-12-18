@@ -251,7 +251,7 @@
                                    IsVisible="{TemplateBinding IsPropertyNameVisible}" />
                         <TextBlock Margin="4,0,0,0" 
                                    FontWeight="DemiBold" FontSize="16"
-                                   Text="{Binding Key}" />
+                                    />
                         <TextBlock Name="PART_ItemCountElement" FontSize="14" Foreground="{DynamicResource SukiLowText}"
                                    Margin="8,2,0,0"
                                    FontWeight="DemiBold"

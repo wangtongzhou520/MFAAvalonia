@@ -211,6 +211,17 @@ public partial class LogItemViewModel : ViewModelBase, IDisposable
         set => SetProperty(ref _isDownloading, value);
     }
 
+    private bool _useMarkdown;
+
+    /// <summary>
+    /// 是否使用Markdown渲染内容，默认关闭
+    /// </summary>
+    public bool UseMarkdown
+    {
+        get => _useMarkdown;
+        set => SetProperty(ref _useMarkdown, value);
+    }
+
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
         UpdateContent();

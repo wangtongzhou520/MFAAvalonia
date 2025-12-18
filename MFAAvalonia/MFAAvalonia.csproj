@@ -35,10 +35,10 @@
     <!-- Version -->
     <PropertyGroup>
         <ApplicationRevision>0</ApplicationRevision>
-        <ApplicationVersion>2.2.0</ApplicationVersion>
+        <ApplicationVersion>2.2.1</ApplicationVersion>
         <Version>1.1</Version>
-        <FileVersion>2.2.0</FileVersion>
-        <AssemblyVersion>2.2.0</AssemblyVersion>
+        <FileVersion>2.2.1</FileVersion>
+        <AssemblyVersion>2.2.1</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
 
@@ -69,27 +69,27 @@
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9"/>
-        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.9"/>
+        <PackageReference Include="Avalonia" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9" />
+        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.9" />
         <PackageReference Include="AvaloniaEdit.TextMate" Version="11.3.0"/>
         <PackageReference Include="AvaloniaExtensions.Axaml" Version="11.3.9"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
         <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.3.0.6"/>
         <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.3.0.6"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.9"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.9" />
         <PackageReference Include="CalcBindingAva" Version="2.5.3"/>
         <PackageReference Include="CrossPlatformProtectedData" Version="1.0.3"/>
         <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.0.316.1"/>
         <PackageReference Include="Lang.Avalonia" Version="11.3.9"/>
         <PackageReference Include="Maa.AgentBinary" Version="1.2.0"/>
         <PackageReference Include="Maa.Framework" Version="5.1.0-preview.3"/>
-        <PackageReference Include="Maa.Framework.Binding.Extensions" Version="5.1.0-preview.3"/>
+        <PackageReference Include="Maa.Framework.Binding.Extensions" Version="5.1.0-preview.3" />
         <PackageReference Include="Maa.Framework.Binding.Native" Version="5.1.0-preview.3"/>
         <PackageReference Include="Maa.Framework.Native" Version="5.1.0-preview.3"/>
         <PackageReference Include="Maa.Framework.Runtimes" Version="5.2.6" />
@@ -212,11 +212,11 @@
                  CopyToPublishDirectory="PreserveNewest">
             <Link>DependencySetup_依赖库安装_win.bat</Link>
         </Content>
-        <Content Include="InstallRuntime.ps1"
-                 Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))"
-                 CopyToPublishDirectory="PreserveNewest">
-            <Link>InstallRuntime.ps1</Link>
-        </Content>
+<!--        <Content Include="InstallRuntime.ps1"-->
+<!--                 Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))"-->
+<!--                 CopyToPublishDirectory="PreserveNewest">-->
+<!--            <Link>InstallRuntime.ps1</Link>-->
+<!--        </Content>-->
 
         <!-- Linux 脚本：匹配 linux-x64 或 linux-arm64 -->
         <Content Include="DependencySetup_依赖库安装_linux.sh"

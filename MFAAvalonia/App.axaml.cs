@@ -87,22 +87,62 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void OnShutdownRequested(object sender, ShutdownRequestedEventArgs e)
-    {
-        ConfigurationManager.Current.SetValue(ConfigurationKeys.TaskItems, Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+        private void OnShutdownRequested(object sender, ShutdownRequestedEventArgs e)
+        {
+            ConfigurationManager.Current.SetValue(ConfigurationKeys.TaskItems, Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+    
+            MaaProcessor.Instance.SetTasker();
+            GlobalHotkeyService.Shutdown();
+    
+            // 强制清理所有应用资源（包括字体）
+            ForceCleanupAllResources();
+    
+            // 释放内存优化器
+            _memoryCracker?.Dispose();
+            _memoryCracker = null;
+    
+            // 取消全局异常事件订阅，避免内存泄漏
+            TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
+            AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
+            Dispatcher.UIThread.UnhandledException -= OnDispatcherUnhandledException;
+        }
 
-        MaaProcessor.Instance.SetTasker();
-        GlobalHotkeyService.Shutdown();
-
-        // 释放内存优化器
-        _memoryCracker?.Dispose();
-        _memoryCracker = null;
-
-        // 取消全局异常事件订阅，避免内存泄漏
-        TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
-        AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
-        Dispatcher.UIThread.UnhandledException -= OnDispatcherUnhandledException;
-    }
+        /// <summary>
+        /// 手动清理内存缓存（用于降低内存占用）
+        /// 此方法会清除字体缓存等非必要的内存占用
+        /// </summary>
+        public static void ClearMemoryCaches()
+        {
+            try
+            {
+                // 清除字体缓存（保留当前使用的字体）
+                FontService.Instance.ClearFontCache();
+    
+                LoggerHelper.Info("[内存管理]已清除应用程序缓存");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Warning($"[内存管理]清除缓存时发生错误: {ex.Message}");
+            }
+        }
+    
+        /// <summary>
+        /// 强制清理所有资源（用于应用退出）
+        /// </summary>
+        private static void ForceCleanupAllResources()
+        {
+            try
+            {
+                // 强制清理所有字体资源
+                FontService.Instance.ForceCleanupAllFontResources();
+                
+                LoggerHelper.Info("[内存管理]已强制清理所有应用资源");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Warning($"[内存管理]强制清理资源时发生错误: {ex.Message}");
+            }
+        }
 
     private static ViewsHelper ConfigureViews(ServiceCollection services)
     {

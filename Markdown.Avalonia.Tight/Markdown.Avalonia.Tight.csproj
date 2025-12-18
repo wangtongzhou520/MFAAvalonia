@@ -18,14 +18,14 @@
     <Configurations>Debug;Release</Configurations>
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
-	<DebugSymbols>False</DebugSymbols>
-	<DebugType>None</DebugType>
-	        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
-    <PropertyGroup>
-        <NoWarn>CS0618;CS8602;CS8618;NETSDK1206;CS8524;CS8604;CS0067;CS0219;CS0612;CS8629;CS8619</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>CS0618;CS8602;CS8618;NETSDK1206;CS8524;CS8604;CS0067;CS0219;CS0612;CS8629;CS8619</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.9" />
   </ItemGroup>
@@ -51,7 +51,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
-  
+
   <!-- see https://stackoverflow.com/questions/41979310/including-referenced-project-dlls-in-nuget-package-net-core-rc3-csproj-file
   <PropertyGroup>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>

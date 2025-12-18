@@ -12,6 +12,7 @@ using MFAAvalonia.Helper.ValueType;
 using MFAAvalonia.ViewModels.Other;
 using MFAAvalonia.ViewModels.UsersControls;
 using MFAAvalonia.ViewModels.UsersControls.Settings;
+using MFAAvalonia.Views.Windows;
 using Newtonsoft.Json;
 using SukiUI.Dialogs;
 using System;
@@ -243,20 +244,32 @@ public partial class TaskQueueViewModel : ViewModelBase
     /// </summary>
     public DisposableObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
-    /// <summary>
-    /// 清理超出限制的旧日志，防止内存泄漏
-    /// DisposableObservableCollection 会自动调用被移除元素的 Dispose()
-    /// </summary>
-    private void TrimExcessLogs()
-    {
-        if (LogItemViewModels.Count <= MaxLogCount) return;
-
-        // 计算需要移除的数量
-        var removeCount = Math.Min(LogCleanupBatchSize, LogItemViewModels.Count - MaxLogCount + LogCleanupBatchSize);
-
-        // 使用 RemoveRange 批量移除，DisposableObservableCollection 会自动 Dispose
-        LogItemViewModels.RemoveRange(0, removeCount);
-    }
+        /// <summary>
+        /// 清理超出限制的旧日志，防止内存泄漏
+        /// DisposableObservableCollection 会自动调用被移除元素的 Dispose()
+        /// </summary>
+        private void TrimExcessLogs()
+        {
+            if (LogItemViewModels.Count <= MaxLogCount) return;
+    
+            // 计算需要移除的数量
+            var removeCount = Math.Min(LogCleanupBatchSize, LogItemViewModels.Count - MaxLogCount + LogCleanupBatchSize);
+    
+            // 使用 RemoveRange 批量移除，DisposableObservableCollection 会自动 Dispose
+            LogItemViewModels.RemoveRange(0, removeCount);
+            
+            // 清理字体缓存，释放未使用的字体资源
+            // 这可以防止因渲染特殊Unicode字符而加载的大量字体占用内存
+            try
+            {
+                FontService.Instance.ClearFontCache();
+                LoggerHelper.Info("[内存优化] 已清理字体缓存");
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.Warning($"清理字体缓存失败: {ex.Message}");
+            }
+        }
 
     public static string FormatFileSize(long size)
     {
@@ -530,7 +543,25 @@ public partial class TaskQueueViewModel : ViewModelBase
         var brush = BrushHelper.ConvertToBrush(color, Brushes.Black);
         AddLogByKey(key, brush, changeColor, transformKey, formatArgsKeys);
     }
-
+    
+    public void AddMarkdown(string key, IBrush? brush = null, bool changeColor = true, bool transformKey = true, params string[] formatArgsKeys)
+    {
+        brush ??= Brushes.Black;
+        Task.Run(() =>
+        {
+            DispatcherHelper.PostOnMainThread(() =>
+            {
+                var log = new LogItemViewModel(key, brush, "Regular", true, "HH':'mm':'ss", changeColor: changeColor, showTime: true, transformKey: transformKey, formatArgsKeys)
+                {
+                    UseMarkdown = true
+                };
+                LogItemViewModels.Add(log);
+                LoggerHelper.Info(log.Content);
+                // 自动清理超出限制的旧日志
+                TrimExcessLogs();
+            });
+        });
+    }
     #endregion
 
     #region 连接

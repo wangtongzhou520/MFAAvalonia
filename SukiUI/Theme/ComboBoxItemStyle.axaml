@@ -36,14 +36,15 @@
                     Margin="3,0,3,3"
                     Name="BorderBasicStyle"
                     Padding="5,0">
-                    <DockPanel>
+                    <Panel>
+                        <!-- 选中指示条 - 使用绝对定位，与左边框对齐 -->
                         <Border
-                            DockPanel.Dock="Left"
                             Width="3"
                             Height="16"
                             CornerRadius="1.5"
                             Background="{DynamicResource SukiPrimaryColor}"
-                            Margin="0,0,3,0"
+                            Margin="-5.5,0,0,0"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Name="CheckSelected" />
                         <ContentPresenter
@@ -53,10 +54,9 @@
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             Margin="1"
                             Name="PART_ContentPresenter"
-                            Padding="5"
+                            Padding="5 5 2 5"
                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-
-                    </DockPanel>
+                    </Panel>
                 </Border>
             </ControlTemplate>
         </Setter>

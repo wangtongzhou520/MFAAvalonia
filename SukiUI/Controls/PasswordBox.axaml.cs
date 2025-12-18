@@ -10,12 +10,12 @@ using System;
 namespace SukiUI.Controls;
 
 [TemplatePart(Name = ElementTextBox, Type = typeof(TextBox))]
-[TemplatePart(Name = ElementToggleButton, Type = typeof(ToggleButton))]
+// [TemplatePart(Name = ElementToggleButton, Type = typeof(ToggleButton))]
 public class PasswordBox : TemplatedControl
 {
     private const string ElementTextBox = "PART_TextBox";
 
-    private const string ElementToggleButton = "PART_ToggleButton";
+    // private const string ElementToggleButton = "PART_ToggleButton";
 
 
     private TextBox _textBox;
@@ -88,22 +88,20 @@ public class PasswordBox : TemplatedControl
 
         if (Password != _textBox.Text)
             _textBox.Text = Password;
-        var toggleButton = e.NameScope.Find<ToggleButton>(ElementToggleButton);
+        // var toggleButton = e.NameScope.Find<ToggleButton>(ElementToggleButton);
 
-
-        if (_textBox == null || toggleButton == null)
+        if (_textBox == null)
             throw new InvalidOperationException("Missing required template parts");
 
-        // 获取模板中的关键部件
-        // 确保模板元素存在
-        if (_textBox == null || toggleButton == null)
-            throw new InvalidOperationException("Missing required template parts");
-
+        // if (_textBox == null || toggleButton == null)
+        //     throw new InvalidOperationException("Missing required template parts");
+        //
         if (_textBox != null)
         {
             _textBox.TextChanged += TextBox_TextChanged;
         }
     }
+    
     private void RaisePasswordChangeEvents()
     {
         Dispatcher.UIThread.Post(() =>

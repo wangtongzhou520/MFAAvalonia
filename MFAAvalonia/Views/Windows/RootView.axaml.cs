@@ -197,6 +197,8 @@ public partial class RootView : SukiWindow
         => Instances.TaskQueueViewModel.AddLogByKey(key, brush, true, transformKey, formatArgsKeys);
     public static void AddLogByKey(string key, IBrush? brush = null, bool changeColor = true, bool transformKey = true, params string[] formatArgsKeys)
         => Instances.TaskQueueViewModel.AddLogByKey(key, brush, changeColor, transformKey, formatArgsKeys);
+    public static void AddMarkdown(string key, IBrush? brush = null, bool changeColor = true, bool transformKey = true, params string[] formatArgsKeys)
+        => Instances.TaskQueueViewModel.AddMarkdown(key, brush, changeColor, transformKey, formatArgsKeys);
 
 #pragma warning  disable CS4014 // 由于此调用不会等待，因此在此调用完成之前将会继续执行当前方法。请考虑将 "await" 运算符应用于调用结果。
     public void LoadUI()

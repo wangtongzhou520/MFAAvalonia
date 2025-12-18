@@ -10,7 +10,7 @@
                 <TextBlock HorizontalAlignment="Stretch"
                            VerticalAlignment="Stretch"
                            FontSize="12"
-                           Text="{Binding}"
+                           Text="{Binding }"
                            TextAlignment="Center" />
             </Template>
         </Setter>

@@ -18,24 +18,22 @@
                     <ToolTip.Tip>
                         <Border MaxWidth="{TemplateBinding TooltipMaxWidth}"
                                 MaxHeight="400"
-                                Padding="4">
-                            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                                          VerticalScrollBarVisibility="Auto">
-                                <full:MarkdownScrollViewer
-                                    Markdown="{TemplateBinding TooltipText}"
-                                    VerticalAlignment="Top">
-                                    <full:MarkdownScrollViewer.Engine>
-                                        <extensions:MarkdownExtension />
-                                    </full:MarkdownScrollViewer.Engine>
-                                    <full:MarkdownScrollViewer.Plugins>
-                                        <StaticResource ResourceKey="MdXamlPlugin" />
-                                    </full:MarkdownScrollViewer.Plugins>
-                                    <full:MarkdownScrollViewer.Styles>
-                                        <StyleInclude Source="avares://MFAAvalonia/Assets/Style/MdXamlDocStyle.axaml" />
-                                        <StyleInclude Source="avares://MFAAvalonia/Assets/Style/MdXamlStyles.axaml" />
-                                    </full:MarkdownScrollViewer.Styles>
-                                </full:MarkdownScrollViewer>
-                            </ScrollViewer>
+                                Padding="4 0 4 4">
+
+                            <full:MarkdownScrollViewer
+                                Markdown="{TemplateBinding TooltipText}"
+                                VerticalAlignment="Top">
+                                <full:MarkdownScrollViewer.Engine>
+                                    <extensions:MarkdownExtension />
+                                </full:MarkdownScrollViewer.Engine>
+                                <full:MarkdownScrollViewer.Plugins>
+                                    <StaticResource ResourceKey="MdXamlPlugin" />
+                                </full:MarkdownScrollViewer.Plugins>
+                                <full:MarkdownScrollViewer.Styles>
+                                    <StyleInclude Source="avares://MFAAvalonia/Assets/Style/MdXamlStyles.axaml" />
+                                </full:MarkdownScrollViewer.Styles>
+                            </full:MarkdownScrollViewer>
+
                         </Border>
                     </ToolTip.Tip>
                     <TextBlock HorizontalAlignment="Center"

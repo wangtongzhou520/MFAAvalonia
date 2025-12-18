@@ -9,12 +9,11 @@
              mc:Ignorable="d">
     <Button Width="25"
             Height="25"
-            Margin="0,-5,-5,-5"
             Padding="0"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             BorderThickness="0"
-            Classes="Void"
+            Classes="Basic Round Void"
             Click="Button_OnClick">
 
         <PathIcon Width="16"

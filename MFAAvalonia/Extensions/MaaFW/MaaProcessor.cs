@@ -980,7 +980,6 @@ public class MaaProcessor
         }
         if (jObject.ContainsKey("focus"))
         {
-            Console.WriteLine(jObject);
             _focusHandler ??= new FocusHandler(AutoInitDictionary);
             _focusHandler.UpdateDictionary(AutoInitDictionary);
             _focusHandler.DisplayFocus(jObject, args.Message, args.Details);

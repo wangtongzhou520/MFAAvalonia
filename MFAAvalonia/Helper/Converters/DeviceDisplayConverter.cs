@@ -22,7 +22,7 @@ public class DeviceDisplayConverter : MarkupExtension, IValueConverter
         {
             var name = device.Name;
             var index = GetFirstEmulatorIndex(device.Config);
-            name = (name.Contains("-") ? (name.Split("-").Length >= 2 ? name.Split("-")[1] : name.Split("-")[0]) : name);
+            name = name.Contains("-") ? name.Split("-")[0] : name;
             return index == -1 ? $"{name} ({device.AdbSerial})" : $"{name} ({device.AdbSerial}) [{index}]";
         }
         if (value is DesktopWindowInfo info)

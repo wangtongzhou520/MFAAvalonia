@@ -12,7 +12,6 @@
              xmlns:converters="clr-namespace:MFAAvalonia.Helper.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ex="clr-namespace:MFAAvalonia.Extensions"
-             xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent.Markup;assembly=FluentIcons.Avalonia.Fluent"
              xmlns:valueType="clr-namespace:MFAAvalonia.Helper.ValueType"
              xmlns:maa="clr-namespace:MFAAvalonia.Extensions.MaaFW"
              xmlns:markup="https://codewf.com"
@@ -26,7 +25,8 @@
              xmlns:interaction="using:Avalonia.Xaml.Interactivity"
              xmlns:avalonia="https://github.com/whistyun/Markdown.Avalonia.Tight"
              xmlns:helper="clr-namespace:MFAAvalonia.Helper"
-             xmlns:avalonia1="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia">
+             xmlns:avalonia1="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
+             xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent">
     <Design.DataContext>
         <pages:TaskQueueViewModel />
     </Design.DataContext>
@@ -42,6 +42,117 @@
                       Header="{markup:I18n {x:Static helper:LangKeys.Delete}}" />
         </ContextMenu>
     </UserControl.Resources>
+    <UserControl.Styles>
+        <!-- SyncButton 图标旋转动画基础样式 -->
+        <Style Selector="Button.SyncButton avalonia1|FluentIcon">
+            <Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        <RotateTransform Angle="0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="Button.SyncButton fluent|FluentIcon">
+            <Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                        <RotateTransform Angle="0"/>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 悬停时逆时针转 -15 度并放大 -->
+        <Style Selector="Button.SyncButton:pointerover avalonia1|FluentIcon">
+            <Style.Animations>
+                <Animation Duration="0:0:0.15" FillMode="Forward">
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ScaleTransform.ScaleX" Value="1.1"/>
+                        <Setter Property="ScaleTransform.ScaleY" Value="1.1"/>
+                        <Setter Property="RotateTransform.Angle" Value="-15"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <Style Selector="Button.SyncButton:pointerover fluent|FluentIcon">
+            <Style.Animations>
+                <Animation Duration="0:0:0.15" FillMode="Forward">
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ScaleTransform.ScaleX" Value="1.1"/>
+                        <Setter Property="ScaleTransform.ScaleY" Value="1.1"/>
+                        <Setter Property="RotateTransform.Angle" Value="-15"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        
+        <!-- 离开悬停时回到原始状态 -->
+        <Style Selector="Button.SyncButton:not(:pointerover) avalonia1|FluentIcon">
+            <Style.Animations>
+                <Animation Duration="0:0:0.15" FillMode="Forward">
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ScaleTransform.ScaleX" Value="1"/>
+                        <Setter Property="ScaleTransform.ScaleY" Value="1"/>
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <Style Selector="Button.SyncButton:not(:pointerover) fluent|FluentIcon">
+            <Style.Animations>
+                <Animation Duration="0:0:0.15" FillMode="Forward">
+                    <KeyFrame Cue="100%">
+                        <Setter Property="ScaleTransform.ScaleX" Value="1"/>
+                        <Setter Property="ScaleTransform.ScaleY" Value="1"/>
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        
+        <!-- 点击时顺时针转 720 度（两圈） -->
+        <Style Selector="Button.SyncButton:pressed avalonia1|FluentIcon">
+            <Style.Animations>
+                <Animation Duration="0:0:2" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="25%">
+                        <Setter Property="RotateTransform.Angle" Value="360"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="360"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <Style Selector="Button.SyncButton:pressed fluent|FluentIcon">
+            <Style.Animations>
+                <Animation Duration="0:0:2" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="25%">
+                        <Setter Property="RotateTransform.Angle" Value="360"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="360"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
     <Grid ClipToBounds="False"
           Margin="0,0,0,0"
           x:Name="MainGrid">
@@ -180,15 +291,15 @@
                                                            IconVariant="Regular" />
                                     </Button>
                                     <Button
-                                        Command="{Binding ResetTasksCommand}" Classes="Basic Round"
+                                        Command="{Binding ResetTasksCommand}" Classes="Basic Round SyncButton"
                                         IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                                         Margin="7,0,8,0"
                                         Padding="0"
                                         ToolTip.Tip="{markup:I18n {x:Static helper:LangKeys.Reset}}">
                                         <avalonia1:FluentIcon Height="18"
-                                                           Icon="ArrowSync"
-                                                           IconSize="Size16"
-                                                           IconVariant="Regular" />
+                                                              Icon="ArrowSync"
+                                                              IconSize="Size16"
+                                                              IconVariant="Regular" />
                                     </Button>
                                 </StackPanel>
                             </Grid>
@@ -343,8 +454,8 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <suki:GlassCard Grid.Row="0"
-                            Margin="0,15,0,5"
-                            x:Name="Row1">
+                            Margin="0,15,0,25"
+                            x:Name="SettingCard">
                 <suki:GlassCard.Resources>
                     <suki:IfConditionConverter x:Key="IfConditionConverter">
                         <suki:IfConditionConverter.True>
@@ -404,8 +515,9 @@
                 </suki:GroupBox>
             </suki:GlassCard>
             <suki:GlassCard Grid.Row="1"
-                            Margin="0,8,0,25"
-                            MaxHeight="{calcBinding:Binding 'Bounds.Height / 2',RelativeSource={RelativeSource FindAncestor,AncestorType=Grid}}">
+                            Margin="0,-7,0,25"
+                            x:Name="IntroductionCard"
+                          >
                 <suki:GroupBox>
                     <suki:GroupBox.Header>
                         <TextBlock FontSize="11"
@@ -532,11 +644,11 @@
                                         Padding="0"
                                         ToolTip.Tip="{markup:I18n {x:Static helper:LangKeys.Custom}}">
                                     <avalonia1:FluentIcon Height="18"
-                                                       Icon="DesktopEdit"
-                                                       IconSize="Size16"
-                                                       IconVariant="Regular" />
+                                                          Icon="DesktopEdit"
+                                                          IconSize="Size16"
+                                                          IconVariant="Regular" />
                                 </Button>
-                                <Button Classes="Basic Round" ClipToBounds="False"
+                                <Button Classes="Basic Round SyncButton" ClipToBounds="False"
                                         Command="{Binding RefreshCommand}"
                                         IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                                         Margin="3,0,3,0"
@@ -656,7 +768,7 @@
                                                           IconVariant="Regular" />
                                 </Button>
 
-                                <Button Classes="Basic Round"
+                                <Button Classes="Basic Round SyncButton"
                                         Command="{Binding ClearCommand}"
                                         IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                                         Margin="3,0,3,0"
@@ -679,7 +791,8 @@
                                   VerticalContentAlignment="Top"
                                   ex:ScrollViewerExtensions.AutoScroll="True"
                                   ex:ScrollViewerExtensions.PanningMode="VerticalOnly">
-                        <ItemsControl ItemsSource="{Binding Path=LogItemViewModels}">
+                        <ItemsControl ItemsSource="{Binding Path=LogItemViewModels}"
+                                    >
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <VirtualizingStackPanel />
@@ -690,24 +803,27 @@
                                     <Grid Name="ParentGrid">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12"
                                                    Name="FirstCol"
                                                    Foreground="{DynamicResource SukiDisabledText}"
                                                    Grid.Column="0"
                                                    HorizontalAlignment="Left"
+                                                   IsVisible="{Binding ShowTime}"
                                                    Margin="0,5,2,0"
                                                    MinWidth="55"
                                                    Text="{Binding Time}"
                                                    TextWrapping="Wrap"
-                                                   VerticalAlignment="Stretch" />
+                                                   VerticalAlignment="Top" />
+                                        <!-- 普通文本显示 -->
                                         <TextBlock FontSize="12"
                                                    FontWeight="{Binding Weight}"
                                                    Foreground="{Binding Color}"
-                                                   Background="{Binding  BackgroundColor}"
+                                                   Background="{Binding BackgroundColor}"
                                                    Grid.Column="1"
                                                    HorizontalAlignment="Stretch"
+                                                   IsVisible="{Binding !UseMarkdown}"
                                                    Margin="0,5"
                                                    TextWrapping="WrapWithOverflow"
                                                    Text="{Binding Content}"
@@ -721,6 +837,29 @@
                                                 </MultiBinding>
                                             </TextBlock.MaxWidth>
                                         </TextBlock>
+                                        <!-- Markdown显示 -->
+                                        <mdxaml:MarkdownScrollViewer Grid.Column="1"
+                                                                     IsVisible="{Binding UseMarkdown}"
+                                                                     Markdown="{Binding Content}"
+                                                                     Margin="0,0,0,0">
+                                            <mdxaml:MarkdownScrollViewer.Engine>
+                                                <ex:MarkdownExtension />
+                                            </mdxaml:MarkdownScrollViewer.Engine>
+                                            <mdxaml:MarkdownScrollViewer.Styles>
+                                                <StyleInclude Source="avares://MFAAvalonia/Assets/Style/MdXamlDocStyle.axaml" />
+                                            </mdxaml:MarkdownScrollViewer.Styles>
+                                            <mdxaml:MarkdownScrollViewer.Plugins>
+                                                <StaticResource ResourceKey="MdXamlPlugin" />
+                                            </mdxaml:MarkdownScrollViewer.Plugins>
+                                            <mdxaml:MarkdownScrollViewer.MaxWidth>
+                                                <MultiBinding Converter="{converters:MaxWidthConverter}">
+                                                    <Binding ElementName="ParentGrid"
+                                                             Path="Bounds.Width" />
+                                                    <Binding ElementName="FirstCol"
+                                                             Path="Bounds.Width" />
+                                                </MultiBinding>
+                                            </mdxaml:MarkdownScrollViewer.MaxWidth>
+                                        </mdxaml:MarkdownScrollViewer>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
